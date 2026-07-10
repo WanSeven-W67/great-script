@@ -6,24 +6,25 @@ function W7Lib:CreateWindow(judulScript)
     local TweenService = game:GetService("TweenService")
     local UserInputService = game:GetService("UserInputService")
     
-    -- Pembersihan otomatis jika GUI sudah ada
     if PlayerGui:FindFirstChild("W7_Premium_Lib") then
         PlayerGui:FindFirstChild("W7_Premium_Lib"):Destroy()
     end
 
-    -- 1. SCREEN GUI (Wadah Utama)
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "W7_Premium_Lib"
     ScreenGui.Parent = PlayerGui
     ScreenGui.ResetOnSpawn = false
     
-    -- 2. MAIN FRAME (Kotak Besar)
+    -- Ukuran default awal (Sedang)
+    local baseWidth = 330
+    local baseHeight = 230
+
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
-    MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22) -- Hitam pekat estetik
-    MainFrame.Position = UDim2.new(0.5, -165, 0.5, -115)   -- Skala ideal HP
-    MainFrame.Size = UDim2.new(0, 330, 0, 230)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+    MainFrame.Position = UDim2.new(0.5, -baseWidth/2, 0.5, -baseHeight/2)
+    MainFrame.Size = UDim2.new(0, baseWidth, 0, baseHeight)
     MainFrame.Active = true
     MainFrame.ClipsDescendants = true
     
@@ -32,11 +33,10 @@ function W7Lib:CreateWindow(judulScript)
     MainCorner.Parent = MainFrame
     
     local MainStroke = Instance.new("UIStroke")
-    MainStroke.Color = Color3.fromRGB(0, 170, 255) -- Aksen metallic blue khas W7
+    MainStroke.Color = Color3.fromRGB(0, 170, 255)
     MainStroke.Thickness = 1.8
     MainStroke.Parent = MainFrame
 
-    -- 3. TOP BAR (Bagian Atas)
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Parent = MainFrame
@@ -47,7 +47,6 @@ function W7Lib:CreateWindow(judulScript)
     TopCorner.CornerRadius = UDim.new(0, 12)
     TopCorner.Parent = TopBar
     
-    -- Menutupi sudut bawah TopBar agar tetap kotak di dalam Frame melengkung
     local TopPatch = Instance.new("Frame")
     TopPatch.Size = UDim2.new(1, 0, 0, 10)
     TopPatch.Position = UDim2.new(0, 0, 1, -10)
@@ -67,7 +66,6 @@ function W7Lib:CreateWindow(judulScript)
     Title.TextSize = 14
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Tombol Perkecil / Minimize GUI
     local MinBtn = Instance.new("TextButton")
     MinBtn.Name = "MinBtn"
     MinBtn.Parent = TopBar
@@ -80,10 +78,9 @@ function W7Lib:CreateWindow(judulScript)
     MinBtn.TextSize = 16
     
     local MinCorner = Instance.new("UICorner")
-    MinCorner.CornerRadius = UDim.new(1, 0) -- Lingkaran bulat
+    MinCorner.CornerRadius = UDim.new(1, 0)
     MinCorner.Parent = MinBtn
 
-    -- 4. TAB CONTAINER (Samping Kiri)
     local TabContainer = Instance.new("ScrollingFrame")
     TabContainer.Name = "TabContainer"
     TabContainer.Parent = MainFrame
@@ -102,7 +99,6 @@ function W7Lib:CreateWindow(judulScript)
     TabList.Padding = UDim.new(0, 6)
     TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    -- 5. PAGE CONTAINER (Kanan)
     local PageContainer = Instance.new("Frame")
     PageContainer.Name = "PageContainer"
     PageContainer.Parent = MainFrame
@@ -110,21 +106,21 @@ function W7Lib:CreateWindow(judulScript)
     PageContainer.Position = UDim2.new(0, 102, 0, 44)
     PageContainer.Size = UDim2.new(1, -108, 1, -50)
 
-    -- SCRIPT LOGIKA PERKECIL (MINIMIZE) GUI
+    -- SCRIPT MINIMIZE
     local minimized = false
     MinBtn.MouseButton1Click:Connect(function()
         if not minimized then
-            TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {Size = UDim2.new(0, 330, 0, 38)}):Play()
+            TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {Size = UDim2.new(0, MainFrame.Size.X.Offset, 0, 38)}):Play()
             MinBtn.Text = "+"
             minimized = true
         else
-            TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {Size = UDim2.new(0, 330, 0, 230)}):Play()
+            TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {Size = UDim2.new(0, MainFrame.Size.X.Offset, 0, baseHeight)}):Play()
             MinBtn.Text = "-"
             minimized = false
         end
     end)
 
-    -- SCRIPT SYSTEM DRAG UNTUK LAYAR HP
+    -- SCRIPT DRAG HP
     local dragging, dragInput, dragStart, startPos
     TopBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -140,12 +136,21 @@ function W7Lib:CreateWindow(judulScript)
         end
     end)
 
-    -- LOGIKA MEMBUAT TAB & ELEMEN DI DALAMNYA
     local WindowFunctions = {}
     local firstTab = true
 
+    -- FUNGSI CUSTOM UNTUK MENGUBAH UKURAN VIA SCRIPT USER
+    function WindowFunctions:ChangeSize(width, height)
+        baseWidth = width
+        baseHeight = height
+        if not minimized then
+            TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, width, 0, height)}):Play()
+            -- Sesuaikan posisi tombol minimize agar tidak melenceng keluar saat membesar
+            TweenService:Create(MinBtn, TweenInfo.new(0.3), {Position = UDim2.new(0, width - 40, 0.2, 0)}):Play()
+        end
+    end
+
     function WindowFunctions:CreateTab(namaTab)
-        -- Membuat Balok Menu di Kiri
         local TabButton = Instance.new("TextButton")
         TabButton.Parent = TabContainer
         TabButton.Size = UDim2.new(0.92, 0, 0, 30)
@@ -159,7 +164,6 @@ function W7Lib:CreateWindow(judulScript)
         TCorner.CornerRadius = UDim.new(0, 5)
         TCorner.Parent = TabButton
 
-        -- Membuat Wadah Halaman di Kanan
         local Page = Instance.new("ScrollingFrame")
         Page.Parent = PageContainer
         Page.BackgroundTransparency = 1
@@ -178,7 +182,6 @@ function W7Lib:CreateWindow(judulScript)
             Page.CanvasSize = UDim2.new(0, 0, 0, PageList.AbsoluteContentSize.Y + 10)
         end)
 
-        -- Otomatis aktifkan tab pertama
         if firstTab then
             TabButton.TextColor3 = Color3.fromRGB(0, 170, 255)
             TabButton.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
@@ -186,7 +189,6 @@ function W7Lib:CreateWindow(judulScript)
             firstTab = false
         end
 
-        -- Aksi pindah Tab saat disentuh
         TabButton.MouseButton1Click:Connect(function()
             for _, v in pairs(PageContainer:GetChildren()) do
                 if v:IsA("ScrollingFrame") then v.Visible = false end
@@ -204,7 +206,6 @@ function W7Lib:CreateWindow(judulScript)
 
         local ElementFunctions = {}
         
-        -- ──> FITUR 1: TOMBOL ELEMEN (CREATE BUTTON)
         function ElementFunctions:CreateButton(namaTombol, callback)
             local Button = Instance.new("TextButton")
             Button.Parent = Page
@@ -226,7 +227,6 @@ function W7Lib:CreateWindow(judulScript)
             BStroke.Parent = Button
 
             Button.MouseButton1Click:Connect(function()
-                -- Efek klik animasi kilat
                 TweenService:Create(Button, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(0, 170, 255)}):Play()
                 task.wait(0.08)
                 TweenService:Create(Button, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(26, 26, 32)}):Play()
@@ -234,7 +234,6 @@ function W7Lib:CreateWindow(judulScript)
             end)
         end
 
-        -- ──> FITUR 2: SAKLAR ON/OFF (CREATE TOGGLE)
         function ElementFunctions:CreateToggle(namaToggle, callback)
             local ToggleFrame = Instance.new("Frame")
             ToggleFrame.Parent = Page
@@ -261,7 +260,6 @@ function W7Lib:CreateWindow(judulScript)
             ToggleLabel.TextSize = 12
             ToggleLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-            -- Kotakan saklar indikator
             local Switch = Instance.new("TextButton")
             Switch.Name = "Switch"
             Switch.Parent = ToggleFrame
@@ -274,7 +272,6 @@ function W7Lib:CreateWindow(judulScript)
             SCorner.CornerRadius = UDim.new(1, 0)
             SCorner.Parent = Switch
             
-            -- Bulatan kecil di dalam saklar
             local Dot = Instance.new("Frame")
             Dot.Parent = Switch
             Dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
