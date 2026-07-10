@@ -409,7 +409,7 @@ function W7Lib:CreateWindow(judulScript)
             end
         end)
 -- =============================================================================
--- BAGIAN: 4 / 4 (Komponen Interaktif & Penutup Framework)
+-- BAGIAN: 4 / 4 (Komponen Interaktif & Penutup Framework - FIX TEXTBOX MOBILE)
 -- =============================================================================
 
         local TabFunctions = {}
@@ -578,6 +578,9 @@ function W7Lib:CreateWindow(judulScript)
             table.insert(ElementsLibrary, {Name = text, Instance = SliderFrame})
         end
 
+        -- =====================================================================
+        -- PERBAIKAN UTAMA: TEXTBOX FIXED FOR MOBILE (KLIK & KETIK LANCAR)
+        -- =====================================================================
         function TabFunctions:CreateTextBox(text, placeholder, callback)
             callback = callback or function() end
             local BoxFrame = Instance.new("Frame")
@@ -586,12 +589,15 @@ function W7Lib:CreateWindow(judulScript)
             BoxFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
             BoxFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.4 or 0
             BoxFrame.Parent = Page
+            
             local BCorner = Instance.new("UICorner")
             BCorner.CornerRadius = UDim.new(0, 6)
             BCorner.Parent = BoxFrame
+            
             local BStroke = Instance.new("UIStroke")
             BStroke.Color = Color3.fromRGB(45, 45, 55)
             BStroke.Parent = BoxFrame
+            
             local Label = Instance.new("TextLabel")
             Label.Size = UDim2.new(0.5, 0, 1, 0)
             Label.Position = UDim2.new(0.04, 0, 0, 0)
@@ -602,6 +608,7 @@ function W7Lib:CreateWindow(judulScript)
             Label.TextSize = 12
             Label.TextXAlignment = Enum.TextXAlignment.Left
             Label.Parent = BoxFrame
+            
             local ActualBox = Instance.new("TextBox")
             ActualBox.Size = UDim2.new(0.4, 0, 0, 22)
             ActualBox.Position = UDim2.new(0.56, 0, 0.2, 0)
@@ -611,9 +618,24 @@ function W7Lib:CreateWindow(judulScript)
             ActualBox.Text = ""
             ActualBox.TextColor3 = Color3.fromRGB(255, 255, 255)
             ActualBox.TextSize = 11
+            ActualBox.ClipsDescendants = true
+            
+            -- Kunci Perbaikan Mobile: Mengaktifkan properti interaksi penuh
+            ActualBox.Active = true
+            ActualBox.Selectable = true
+            ActualBox.ZIndex = 5 -- Memastikan berada di atas lapisan Frame
+
             local ABCorner = Instance.new("UICorner")
             ABCorner.CornerRadius = UDim.new(0, 4)
             ABCorner.Parent = ActualBox
+
+            -- Trik Tambahan Mobile: Paksa memunculkan keyboard HP saat area diketuk
+            ActualBox.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    ActualBox:CaptureFocus()
+                end
+            end)
+
             ActualBox.FocusLost:Connect(function(enterPressed)
                 PlayClickSound()
                 task.spawn(callback, ActualBox.Text, enterPressed)
@@ -681,3 +703,5 @@ function W7Lib:CreateWindow(judulScript)
     return WindowFunctions
 end
 return W7Lib
+
+    
