@@ -409,7 +409,7 @@ function W7Lib:CreateWindow(judulScript)
             end
         end)
 -- =============================================================================
--- BAGIAN: 4 / 4 (Komponen Interaktif & Penutup Framework - FIX TEXTBOX MOBILE)
+-- BAGIAN: 4 / 4 (Komponen Interaktif & Penutup Framework - CLEAN v1.1)
 -- =============================================================================
 
         local TabFunctions = {}
@@ -579,8 +579,131 @@ function W7Lib:CreateWindow(judulScript)
         end
 
         -- =====================================================================
-        -- PERBAIKAN UTAMA: TEXTBOX FIXED FOR MOBILE (KLIK & KETIK LANCAR)
+        -- FITUR BARU: CREATE ADAPTIVE SLIDER (GABUNGAN SLIDER & TEXTBOX SINKRON)
         -- =====================================================================
+        function TabFunctions:CreateAdaptiveSlider(text, min, max, default, callback)
+            callback = callback or function() end
+            local value = math.clamp(default or min, min, max)
+            
+            local SliderFrame = Instance.new("Frame")
+            SliderFrame.Name = text
+            SliderFrame.Size = UDim2.new(0.94, 0, 0, 54)
+            SliderFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+            SliderFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.4 or 0
+            SliderFrame.Parent = Page
+            
+            local SCorner = Instance.new("UICorner")
+            SCorner.CornerRadius = UDim.new(0, 6)
+            SCorner.Parent = SliderFrame
+            
+            local SStroke = Instance.new("UIStroke")
+            SStroke.Color = Color3.fromRGB(45, 45, 55)
+            SStroke.Parent = SliderFrame
+            
+            local Label = Instance.new("TextLabel")
+            Label.Size = UDim2.new(0.5, 0, 0, 24)
+            Label.Position = UDim2.new(0.04, 0, 0, 4)
+            Label.BackgroundTransparency = 1
+            Label.Font = Enum.Font.GothamMedium
+            Label.Text = text
+            Label.TextColor3 = Color3.fromRGB(230, 230, 230)
+            Label.TextSize = 12
+            Label.TextXAlignment = Enum.TextXAlignment.Left
+            Label.Parent = SliderFrame
+            
+            local ActualBox = Instance.new("TextBox")
+            ActualBox.Size = UDim2.new(0, 50, 0, 20)
+            ActualBox.Position = UDim2.new(1, -60, 0, 6)
+            ActualBox.BackgroundColor3 = Color3.fromRGB(16, 16, 22)
+            ActualBox.Font = Enum.Font.GothamBold
+            ActualBox.Text = tostring(value)
+            ActualBox.TextColor3 = Color3.fromRGB(unpack(Config.ThemeColor))
+            ActualBox.TextSize = 11
+            ActualBox.Active = true
+            ActualBox.Selectable = true
+            ActualBox.MultiLine = false
+            ActualBox.Parent = SliderFrame
+            
+            local ABCorner = Instance.new("UICorner")
+            ABCorner.CornerRadius = UDim.new(0, 4)
+            ABCorner.Parent = ActualBox
+            
+            local ABStroke = Instance.new("UIStroke")
+            ABStroke.Color = Color3.fromRGB(40, 40, 50)
+            ABStroke.Parent = ActualBox
+            
+            local Track = Instance.new("TextButton")
+            Track.Size = UDim2.new(0.92, 0, 0, 5)
+            Track.Position = UDim2.new(0.04, 0, 0, 38)
+            Track.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+            Track.Text = ""
+            Track.Parent = SliderFrame
+            
+            local TCorner = Instance.new("UICorner")
+            TCorner.CornerRadius = UDim.new(1, 0)
+            TCorner.Parent = Track
+            
+            local Fill = Instance.new("Frame")
+            Fill.Size = UDim2.new((value - min) / (max - min), 0, 1, 0)
+            Fill.BackgroundColor3 = Color3.fromRGB(unpack(Config.ThemeColor))
+            Fill.BorderSizePixel = 0
+            Fill.Parent = Track
+            
+            local FCorner = Instance.new("UICorner")
+            FCorner.CornerRadius = UDim.new(1, 0)
+            FCorner.Parent = Fill
+
+            local OverlayTrigger = Instance.new("TextButton")
+            OverlayTrigger.Size = UDim2.new(1, 0, 1, 0)
+            OverlayTrigger.BackgroundTransparency = 1
+            OverlayTrigger.Text = ""
+            OverlayTrigger.ZIndex = 5
+            OverlayTrigger.Parent = ActualBox
+
+            OverlayTrigger.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    ActualBox:CaptureFocus()
+                end
+            end)
+            
+            local sliding = false
+            local function UpdateFromSlider(input)
+                local ratio = math.clamp((input.Position.X - Track.AbsolutePosition.X) / Track.AbsoluteSize.X, 0, 1)
+                value = math.floor(min + (max - min) * ratio)
+                ActualBox.Text = tostring(value)
+                Fill.Size = UDim2.new(ratio, 0, 1, 0)
+                task.spawn(callback, value)
+            end
+            
+            Track.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    sliding = true; UpdateFromSlider(input)
+                end
+            end)
+            UserInputService.InputChanged:Connect(function(input)
+                if sliding and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                    UpdateFromSlider(input)
+                end
+            end)
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    sliding = false
+                end
+            end)
+            
+            ActualBox.FocusLost:Connect(function()
+                PlayClickSound()
+                local num = tonumber(ActualBox.Text)
+                if num then value = math.clamp(math.floor(num), min, max) else value = min end
+                ActualBox.Text = tostring(value)
+                local ratio = (value - min) / (max - min)
+                TweenService:Create(Fill, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(ratio, 0, 1, 0)}):Play()
+                task.spawn(callback, value)
+            end)
+            
+            table.insert(ElementsLibrary, {Name = text, Instance = SliderFrame})
+        end
+
         function TabFunctions:CreateTextBox(text, placeholder, callback)
             callback = callback or function() end
             local BoxFrame = Instance.new("Frame")
@@ -589,15 +712,12 @@ function W7Lib:CreateWindow(judulScript)
             BoxFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
             BoxFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.4 or 0
             BoxFrame.Parent = Page
-            
             local BCorner = Instance.new("UICorner")
             BCorner.CornerRadius = UDim.new(0, 6)
             BCorner.Parent = BoxFrame
-            
             local BStroke = Instance.new("UIStroke")
             BStroke.Color = Color3.fromRGB(45, 45, 55)
             BStroke.Parent = BoxFrame
-            
             local Label = Instance.new("TextLabel")
             Label.Size = UDim2.new(0.5, 0, 1, 0)
             Label.Position = UDim2.new(0.04, 0, 0, 0)
@@ -608,7 +728,6 @@ function W7Lib:CreateWindow(judulScript)
             Label.TextSize = 12
             Label.TextXAlignment = Enum.TextXAlignment.Left
             Label.Parent = BoxFrame
-            
             local ActualBox = Instance.new("TextBox")
             ActualBox.Size = UDim2.new(0.4, 0, 0, 22)
             ActualBox.Position = UDim2.new(0.56, 0, 0.2, 0)
@@ -618,24 +737,9 @@ function W7Lib:CreateWindow(judulScript)
             ActualBox.Text = ""
             ActualBox.TextColor3 = Color3.fromRGB(255, 255, 255)
             ActualBox.TextSize = 11
-            ActualBox.ClipsDescendants = true
-            
-            -- Kunci Perbaikan Mobile: Mengaktifkan properti interaksi penuh
-            ActualBox.Active = true
-            ActualBox.Selectable = true
-            ActualBox.ZIndex = 5 -- Memastikan berada di atas lapisan Frame
-
             local ABCorner = Instance.new("UICorner")
             ABCorner.CornerRadius = UDim.new(0, 4)
             ABCorner.Parent = ActualBox
-
-            -- Trik Tambahan Mobile: Paksa memunculkan keyboard HP saat area diketuk
-            ActualBox.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    ActualBox:CaptureFocus()
-                end
-            end)
-
             ActualBox.FocusLost:Connect(function(enterPressed)
                 PlayClickSound()
                 task.spawn(callback, ActualBox.Text, enterPressed)
@@ -703,5 +807,3 @@ function W7Lib:CreateWindow(judulScript)
     return WindowFunctions
 end
 return W7Lib
-
-    
