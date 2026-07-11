@@ -1,9 +1,3 @@
--- =============================================================================
--- MAHA KARYA: W7 PREMIUM UI LIBRARY (FRAMEWORK v1.1)
--- PEMBUAT: W7 (WanSeven)
--- BAGIAN: 1 / 4 (Fondasi, Auto-Scale, & Core Engine)
--- =============================================================================
-
 local W7Lib = {}
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -119,7 +113,6 @@ function W7Lib:CreateWindow(judulScript)
     Title.TextSize = 14
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Tombol Minimize Biasa [-]
     local MinBtn = Instance.new("TextButton")
     MinBtn.Name = "MinBtn"
     MinBtn.Parent = TopBar
@@ -134,16 +127,11 @@ function W7Lib:CreateWindow(judulScript)
     local MinCorner = Instance.new("UICorner")
     MinCorner.CornerRadius = UDim.new(1, 0)
     MinCorner.Parent = MinBtn
--- =============================================================================
--- BAGIAN: 2 / 4 (Dual Minimize System & Drag Engine)
--- =============================================================================
-
-    -- FITUR BARU: Membuat Tombol Bulat Mini [o] di TopBar
     local FloatBtnTrigger = Instance.new("TextButton")
     FloatBtnTrigger.Name = "FloatBtnTrigger"
     FloatBtnTrigger.Parent = TopBar
     FloatBtnTrigger.BackgroundColor3 = Color3.fromRGB(32, 32, 42)
-    FloatBtnTrigger.Position = UDim2.new(1, -64, 0.22, 0) -- Berjejer di kiri tombol [-]
+    FloatBtnTrigger.Position = UDim2.new(1, -64, 0.22, 0)
     FloatBtnTrigger.Size = UDim2.new(0, 24, 0, 24)
     FloatBtnTrigger.Text = "o"
     FloatBtnTrigger.Font = Enum.Font.GothamBold
@@ -154,7 +142,6 @@ function W7Lib:CreateWindow(judulScript)
     FloatTriggerCorner.CornerRadius = UDim.new(1, 0)
     FloatTriggerCorner.Parent = FloatBtnTrigger
 
-    -- FITUR BARU: Tombol Bulat Melayang Luar (W7 Floating Icon)
     local FloatingButton = Instance.new("TextButton")
     FloatingButton.Name = "W7_FloatingButton"
     FloatingButton.Parent = ScreenGui
@@ -177,21 +164,18 @@ function W7Lib:CreateWindow(judulScript)
     FloatStroke.Thickness = 2
     FloatStroke.Parent = FloatingButton
 
-    -- Logika Klik Tombol [o] (Masuk Mode Bulat)
     FloatBtnTrigger.MouseButton1Click:Connect(function()
         PlayClickSound()
         MainFrame.Visible = false
         FloatingButton.Visible = true
     end)
 
-    -- Logika Klik Tombol Bulat (Kembali ke Menu Utama)
     FloatingButton.MouseButton1Click:Connect(function()
         PlayClickSound()
         FloatingButton.Visible = false
         MainFrame.Visible = true
     end)
 
-    -- Sistem Drag untuk Tombol Bulat Melayang di HP
     local fDragging, fDragInput, fDragStart, fStartPos
     FloatingButton.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -211,7 +195,6 @@ function W7Lib:CreateWindow(judulScript)
         end
     end)
 
-    -- Logika Tombol [-] (Minimize Jadi Bar Bawaan Core)
     local minimized = false
     MinBtn.MouseButton1Click:Connect(function()
         PlayClickSound()
@@ -226,7 +209,6 @@ function W7Lib:CreateWindow(judulScript)
         end
     end)
 
-    -- Sistem Drag Main Frame Utama
     local dragging, dragInput, dragStart, startPos
     TopBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -245,10 +227,6 @@ function W7Lib:CreateWindow(judulScript)
             MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
--- =============================================================================
--- BAGIAN: 3 / 4 (Search Engine & Tab Manager)
--- =============================================================================
-
     local SearchBox = Instance.new("TextBox")
     SearchBox.Name = "SearchBox"
     SearchBox.Parent = TopBar
@@ -408,13 +386,8 @@ function W7Lib:CreateWindow(judulScript)
                 end
             end
         end)
--- =============================================================================
--- BAGIAN: 4-A / 4 (KOMPONEN UTAMA: BUTTON, TOGGLE, & SLIDER STANDAR)
--- =============================================================================
-
         local TabFunctions = {}
 
-        -- 1. FITUR TOMBOL (BUTTON)
         function TabFunctions:CreateButton(text, callback)
             callback = callback or function() end
             local ButtonFrame = Instance.new("Frame")
@@ -423,15 +396,12 @@ function W7Lib:CreateWindow(judulScript)
             ButtonFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
             ButtonFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.4 or 0
             ButtonFrame.Parent = Page
-            
             local BCorner = Instance.new("UICorner")
             BCorner.CornerRadius = UDim.new(0, 6)
             BCorner.Parent = ButtonFrame
-            
             local BStroke = Instance.new("UIStroke")
             BStroke.Color = Color3.fromRGB(45, 45, 55)
             BStroke.Parent = ButtonFrame
-            
             local ActualButton = Instance.new("TextButton")
             ActualButton.Size = UDim2.new(1, 0, 1, 0)
             ActualButton.BackgroundTransparency = 1
@@ -440,7 +410,6 @@ function W7Lib:CreateWindow(judulScript)
             ActualButton.TextColor3 = Color3.fromRGB(255, 255, 255)
             ActualButton.TextSize = 12
             ActualButton.Parent = ButtonFrame
-            
             ActualButton.MouseButton1Click:Connect(function()
                 PlayClickSound()
                 BStroke.Color = Color3.fromRGB(unpack(Config.ThemeColor))
@@ -448,11 +417,9 @@ function W7Lib:CreateWindow(judulScript)
                 task.wait(0.15)
                 BStroke.Color = Color3.fromRGB(45, 45, 55)
             end)
-            
             table.insert(ElementsLibrary, {Name = text, Instance = ButtonFrame})
         end
 
-        -- 2. FITUR SAKLAR (TOGGLE)
         function TabFunctions:CreateToggle(text, default, callback)
             callback = callback or function() end
             local state = default or false
@@ -462,15 +429,12 @@ function W7Lib:CreateWindow(judulScript)
             ToggleFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
             ToggleFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.4 or 0
             ToggleFrame.Parent = Page
-            
             local TCorner = Instance.new("UICorner")
             TCorner.CornerRadius = UDim.new(0, 6)
             TCorner.Parent = ToggleFrame
-            
             local TStroke = Instance.new("UIStroke")
             TStroke.Color = Color3.fromRGB(45, 45, 55)
             TStroke.Parent = ToggleFrame
-            
             local Label = Instance.new("TextLabel")
             Label.Size = UDim2.new(0.7, 0, 1, 0)
             Label.Position = UDim2.new(0.04, 0, 0, 0)
@@ -481,28 +445,23 @@ function W7Lib:CreateWindow(judulScript)
             Label.TextSize = 12
             Label.TextXAlignment = Enum.TextXAlignment.Left
             Label.Parent = ToggleFrame
-            
             local Switch = Instance.new("TextButton")
             Switch.Size = UDim2.new(0, 36, 0, 18)
             Switch.Position = UDim2.new(1, -46, 0.25, 0)
             Switch.BackgroundColor3 = state and Color3.fromRGB(unpack(Config.ThemeColor)) or Color3.fromRGB(40, 40, 50)
             Switch.Text = ""
             Switch.Parent = ToggleFrame
-            
             local SCorner = Instance.new("UICorner")
             SCorner.CornerRadius = UDim.new(1, 0)
             SCorner.Parent = Switch
-            
             local SliderDot = Instance.new("Frame")
             SliderDot.Size = UDim2.new(0, 14, 0, 14)
             SliderDot.Position = state and UDim2.new(1, -16, 0.1, 0) or UDim2.new(0, 2, 0.1, 0)
             SliderDot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             SliderDot.Parent = Switch
-            
             local DCorner = Instance.new("UICorner")
             DCorner.CornerRadius = UDim.new(1, 0)
             DCorner.Parent = SliderDot
-            
             Switch.MouseButton1Click:Connect(function()
                 PlayClickSound()
                 state = not state
@@ -512,11 +471,9 @@ function W7Lib:CreateWindow(judulScript)
                 TweenService:Create(Switch, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
                 task.spawn(callback, state)
             end)
-            
             table.insert(ElementsLibrary, {Name = text, Instance = ToggleFrame})
         end
 
-        -- 3. FITUR GESER STANDAR (SLIDER)
         function TabFunctions:CreateSlider(text, min, max, default, callback)
             callback = callback or function() end
             local value = math.clamp(default or min, min, max)
@@ -526,15 +483,12 @@ function W7Lib:CreateWindow(judulScript)
             SliderFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
             SliderFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.4 or 0
             SliderFrame.Parent = Page
-            
             local SCorner = Instance.new("UICorner")
             SCorner.CornerRadius = UDim.new(0, 6)
             SCorner.Parent = SliderFrame
-            
             local SStroke = Instance.new("UIStroke")
             SStroke.Color = Color3.fromRGB(45, 45, 55)
             SStroke.Parent = SliderFrame
-            
             local Label = Instance.new("TextLabel")
             Label.Size = UDim2.new(0.6, 0, 0, 22)
             Label.Position = UDim2.new(0.04, 0, 0, 2)
@@ -545,7 +499,6 @@ function W7Lib:CreateWindow(judulScript)
             Label.TextSize = 12
             Label.TextXAlignment = Enum.TextXAlignment.Left
             Label.Parent = SliderFrame
-            
             local ValueLabel = Instance.new("TextLabel")
             ValueLabel.Size = UDim2.new(0.3, 0, 0, 22)
             ValueLabel.Position = UDim2.new(0.66, 0, 0, 2)
@@ -556,28 +509,23 @@ function W7Lib:CreateWindow(judulScript)
             ValueLabel.TextSize = 12
             ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
             ValueLabel.Parent = SliderFrame
-            
             local Track = Instance.new("TextButton")
             Track.Size = UDim2.new(0.92, 0, 0, 4)
             Track.Position = UDim2.new(0.04, 0, 0.7, 0)
             Track.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
             Track.Text = ""
             Track.Parent = SliderFrame
-            
             local TCorner = Instance.new("UICorner")
             TCorner.CornerRadius = UDim.new(1, 0)
             TCorner.Parent = Track
-            
             local Fill = Instance.new("Frame")
             Fill.Size = UDim2.new((value - min) / (max - min), 0, 1, 0)
             Fill.BackgroundColor3 = Color3.fromRGB(unpack(Config.ThemeColor))
             Fill.BorderSizePixel = 0
             Fill.Parent = Track
-            
             local FCorner = Instance.new("UICorner")
             FCorner.CornerRadius = UDim.new(1, 0)
             FCorner.Parent = Fill
-            
             local sliding = false
             local function UpdateSlider(input)
                 local ratio = math.clamp((input.Position.X - Track.AbsolutePosition.X) / Track.AbsoluteSize.X, 0, 1)
@@ -586,7 +534,6 @@ function W7Lib:CreateWindow(judulScript)
                 Fill.Size = UDim2.new(ratio, 0, 1, 0)
                 task.spawn(callback, value)
             end
-            
             Track.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                     sliding = true; UpdateSlider(input)
@@ -602,17 +549,16 @@ function W7Lib:CreateWindow(judulScript)
                     sliding = false
                 end
             end)
-            
             table.insert(ElementsLibrary, {Name = text, Instance = SliderFrame})
         end
-        -- 4. FITUR DUA BARIS SINKRON (ADAPTIVE SLIDER) - MAHA KARYA W7[span_0](start_span)[span_0](end_span)
+
         function TabFunctions:CreateAdaptiveSlider(text, min, max, default, callback)
             callback = callback or function() end
             local value = math.clamp(default or min, min, max)
             
             local SliderFrame = Instance.new("Frame")
             SliderFrame.Name = text
-            SliderFrame.Size = UDim2.new(0.94, 0, 0, 54)[span_1](start_span)[span_1](end_span)
+            SliderFrame.Size = UDim2.new(0.94, 0, 0, 54)
             SliderFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
             SliderFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.4 or 0
             SliderFrame.Parent = Page
@@ -646,7 +592,7 @@ function W7Lib:CreateWindow(judulScript)
             ActualBox.TextSize = 11
             ActualBox.Active = true
             ActualBox.Selectable = true
-            ActualBox.MultiLine = false[span_2](start_span)[span_2](end_span)
+            ActualBox.MultiLine = false
             ActualBox.Parent = SliderFrame
             
             local ABCorner = Instance.new("UICorner")
@@ -682,12 +628,12 @@ function W7Lib:CreateWindow(judulScript)
             OverlayTrigger.Size = UDim2.new(1, 0, 1, 0)
             OverlayTrigger.BackgroundTransparency = 1
             OverlayTrigger.Text = ""
-            OverlayTrigger.ZIndex = 5[span_3](start_span)[span_3](end_span)
+            OverlayTrigger.ZIndex = 5
             OverlayTrigger.Parent = ActualBox
 
             OverlayTrigger.InputEnded:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    ActualBox:CaptureFocus()[span_4](start_span)[span_4](end_span)
+                    ActualBox:CaptureFocus()
                 end
             end)
             
@@ -729,12 +675,11 @@ function W7Lib:CreateWindow(judulScript)
             table.insert(ElementsLibrary, {Name = text, Instance = SliderFrame})
         end
 
-        -- 5. FITUR KOTAK INPUT STANDAR (TEXTBOX) - FIX MOBILE SENSITIF[span_5](start_span)[span_5](end_span)
         function TabFunctions:CreateTextBox(text, placeholder, callback)
             callback = callback or function() end
             local BoxFrame = Instance.new("Frame")
             BoxFrame.Name = text
-            BoxFrame.Size = UDim2.new(0.94, 0, 0, 38)[span_6](start_span)[span_6](end_span)
+            BoxFrame.Size = UDim2.new(0.94, 0, 0, 38)
             BoxFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
             BoxFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.4 or 0
             BoxFrame.Parent = Page
@@ -759,7 +704,7 @@ function W7Lib:CreateWindow(judulScript)
             Label.Parent = BoxFrame
             
             local ActualBox = Instance.new("TextBox")
-            ActualBox.Size = UDim2.new(0.4, 0, 0, 22)[span_7](start_span)[span_7](end_span)
+            ActualBox.Size = UDim2.new(0.4, 0, 0, 22)
             ActualBox.Position = UDim2.new(0.56, 0, 0.2, 0)
             ActualBox.BackgroundColor3 = Color3.fromRGB(16, 16, 22)
             ActualBox.Font = Enum.Font.Gotham
@@ -768,24 +713,23 @@ function W7Lib:CreateWindow(judulScript)
             ActualBox.TextColor3 = Color3.fromRGB(255, 255, 255)
             ActualBox.TextSize = 11
             
-            ActualBox.Active = true[span_8](start_span)[span_8](end_span)
-            ActualBox.Selectable = true[span_9](start_span)[span_9](end_span)
+            ActualBox.Active = true
+            ActualBox.Selectable = true
             
             local ABCorner = Instance.new("UICorner")
             ABCorner.CornerRadius = UDim.new(0, 4)
             ABCorner.Parent = ActualBox
             
-            -- Lapisan Trigger Transparan (Anti-Macet Di HP)[span_10](start_span)[span_10](end_span)
             local OverlayTrigger = Instance.new("TextButton")
             OverlayTrigger.Size = UDim2.new(1, 0, 1, 0)
             OverlayTrigger.BackgroundTransparency = 1
             OverlayTrigger.Text = ""
-            OverlayTrigger.ZIndex = 5[span_11](start_span)[span_11](end_span)
+            OverlayTrigger.ZIndex = 5
             OverlayTrigger.Parent = ActualBox
 
             OverlayTrigger.InputEnded:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    ActualBox:CaptureFocus()[span_12](start_span)[span_12](end_span)
+                    ActualBox:CaptureFocus()
                 end
             end)
 
@@ -797,11 +741,10 @@ function W7Lib:CreateWindow(judulScript)
             table.insert(ElementsLibrary, {Name = text, Instance = BoxFrame})
         end
 
-        -- 6. FITUR PARAGRAF (PARAGRAPH)[span_13](start_span)[span_13](end_span)
         function TabFunctions:CreateParagraph(title, desc)
             local ParaFrame = Instance.new("Frame")
             ParaFrame.Name = title
-            ParaFrame.Size = UDim2.new(0.94, 0, 0, 50)[span_14](start_span)[span_14](end_span)
+            ParaFrame.Size = UDim2.new(0.94, 0, 0, 50)
             ParaFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
             ParaFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.5 or 0
             ParaFrame.Parent = Page
@@ -835,34 +778,32 @@ function W7Lib:CreateWindow(judulScript)
             DescLabel.TextSize = 11
             DescLabel.TextXAlignment = Enum.TextXAlignment.Left
             DescLabel.TextYAlignment = Enum.TextYAlignment.Top
-            DescLabel.TextWrapped = true[span_15](start_span)[span_15](end_span)
+            DescLabel.TextWrapped = true
             DescLabel.Parent = ParaFrame
             
-            if DescLabel.TextBounds.X > DescLabel.AbsoluteSize.X then[span_16](start_span)[span_16](end_span)
-                ParaFrame.Size = UDim2.new(0.94, 0, 0, 60)[span_17](start_span)[span_17](end_span)
-                DescLabel.Size = UDim2.new(0.92, 0, 0, 34)[span_18](start_span)[span_18](end_span)
+            if DescLabel.TextBounds.X > DescLabel.AbsoluteSize.X then
+                ParaFrame.Size = UDim2.new(0.94, 0, 0, 60)
+                DescLabel.Size = UDim2.new(0.92, 0, 0, 34)
             end
             
             table.insert(ElementsLibrary, {Name = title .. " " .. desc, Instance = ParaFrame})
         end
 
-        -- 7. FITUR GAMBAR LATAR (BACKGROUND IMAGE SETTER)[span_19](start_span)[span_19](end_span)
         function WindowFunctions:SetBackgroundImage(assetId)
-            Config.BgImage = "rbxassetid://" .. tostring(assetId:match("%d+"))[span_20](start_span)[span_20](end_span)
-            BgImageLabel.Image = Config.BgImage[span_21](start_span)[span_21](end_span)
-            TopBar.BackgroundTransparency = 0.2[span_22](start_span)[span_22](end_span)
-            TabContainer.BackgroundTransparency = 0.4[span_23](start_span)[span_23](end_span)
-            SaveConfig()[span_24](start_span)[span_24](end_span)
+            Config.BgImage = "rbxassetid://" .. tostring(assetId:match("%d+"))
+            BgImageLabel.Image = Config.BgImage
+            TopBar.BackgroundTransparency = 0.2
+            TabContainer.BackgroundTransparency = 0.4
+            SaveConfig()
         end
 
-        -- 8. FITUR MENGHANCURKAN MENU (DESTROY GUI)[span_25](start_span)[span_25](end_span)
         function WindowFunctions:DestroyGUI()
-            WatermarkUI:Destroy()[span_26](start_span)[span_26](end_span)
-            ScreenGui:Destroy()[span_27](start_span)[span_27](end_span)
+            WatermarkUI:Destroy()
+            ScreenGui:Destroy()
         end
 
-        return TabFunctions[span_28](start_span)[span_28](end_span)
+        return TabFunctions
     end
-    return WindowFunctions[span_29](start_span)[span_29](end_span)
+    return WindowFunctions
 end
-return W7Lib[span_30](start_span)[span_30](end_span)
+return W7Lib
