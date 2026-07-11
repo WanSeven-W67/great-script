@@ -420,6 +420,48 @@ function W7Lib:CreateWindow(judulScript)
             table.insert(ElementsLibrary, {Name = text, Instance = ButtonFrame})
         end
 
+function TabFunctions:CreateButtonToggle(text, default, callback)
+    callback = callback or function() end
+    local state = default or false
+    
+    local ToggleFrame = Instance.new("Frame")
+    ToggleFrame.Name = text
+    ToggleFrame.Size = UDim2.new(0.94, 0, 0, 44) -- Tinggi 44 (Agak gede)
+    ToggleFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+    ToggleFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.4 or 0
+    ToggleFrame.Parent = Page
+    
+    -- Membuat sudut melengkung oval/silinder penuh
+    local TCorner = Instance.new("UICorner")
+    TCorner.CornerRadius = UDim.new(0, 22) -- Setengah dari tinggi frame
+    TCorner.Parent = ToggleFrame
+    
+    local TStroke = Instance.new("UIStroke")
+    TStroke.Color = state and Color3.fromRGB(unpack(Config.ThemeColor)) or Color3.fromRGB(45, 45, 55)
+    TStroke.Thickness = 1.5
+    TStroke.Parent = ToggleFrame
+    
+    local BigButton = Instance.new("TextButton")
+    BigButton.Size = UDim2.new(1, 0, 1, 0)
+    BigButton.BackgroundTransparency = 1
+    BigButton.Font = Enum.Font.GothamMedium
+    BigButton.Text = text .. " : " .. (state and "ON" or "OFF")
+    BigButton.TextColor3 = state and Color3.fromRGB(unpack(Config.ThemeColor)) or Color3.fromRGB(150, 150, 155)
+    BigButton.TextSize = 12
+    BigButton.Parent = ToggleFrame
+    
+    BigButton.MouseButton1Click:Connect(function()
+        if PlayClickSound then PlayClickSound() end
+        state = not state
+        BigButton.Text = text .. " : " .. (state and "ON" or "OFF")
+        BigButton.TextColor3 = state and Color3.fromRGB(unpack(Config.ThemeColor)) or Color3.fromRGB(150, 150, 155)
+        TStroke.Color = state and Color3.fromRGB(unpack(Config.ThemeColor)) or Color3.fromRGB(45, 45, 55)
+        task.spawn(callback, state)
+    end)
+    
+    table.insert(ElementsLibrary, {Name = text, Instance = ToggleFrame})
+end
+
         function TabFunctions:CreateToggle(text, default, callback)
             callback = callback or function() end
             local state = default or false
