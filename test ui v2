@@ -679,7 +679,7 @@ function W7Lib:CreateWindow(judulScript)
             callback = callback or function() end
             local BoxFrame = Instance.new("Frame")
             BoxFrame.Name = text
-            BoxFrame.Size = UDim2.new(0.94, 0, 0, 38)
+            BoxFrame.Size = UDim2.new(0.94, 0, 0, 38)[span_2](start_span)[span_2](end_span)
             BoxFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
             BoxFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.4 or 0
             BoxFrame.Parent = Page
@@ -693,7 +693,7 @@ function W7Lib:CreateWindow(judulScript)
             BStroke.Parent = BoxFrame
             
             local Label = Instance.new("TextLabel")
-            Label.Size = UDim2.new(0.5, 0, 1, 0)
+            Label.Size = UDim2.new(0.6, 0, 1, 0) -- Diperluas sedikit biar teks judul aman
             Label.Position = UDim2.new(0.04, 0, 0, 0)
             Label.BackgroundTransparency = 1
             Label.Font = Enum.Font.GothamMedium
@@ -703,9 +703,10 @@ function W7Lib:CreateWindow(judulScript)
             Label.TextXAlignment = Enum.TextXAlignment.Left
             Label.Parent = BoxFrame
             
+            -- FIX POSISI: Ukuran & letak kotak input hitam digeser biar pas di frame kustomisasi kamu[span_3](start_span)[span_3](end_span)
             local ActualBox = Instance.new("TextBox")
-            ActualBox.Size = UDim2.new(0.4, 0, 0, 22)
-            ActualBox.Position = UDim2.new(0.56, 0, 0.2, 0)
+            ActualBox.Size = UDim2.new(0, 70, 0, 22) -- Ukuran kotak solid 70 pixel[span_4](start_span)[span_4](end_span)
+            ActualBox.Position = UDim2.new(1, -80, 0.2, 0) -- Nempel di kanan minus 80 pixel[span_5](start_span)[span_5](end_span)
             ActualBox.BackgroundColor3 = Color3.fromRGB(16, 16, 22)
             ActualBox.Font = Enum.Font.Gotham
             ActualBox.PlaceholderText = placeholder
@@ -713,23 +714,27 @@ function W7Lib:CreateWindow(judulScript)
             ActualBox.TextColor3 = Color3.fromRGB(255, 255, 255)
             ActualBox.TextSize = 11
             
-            ActualBox.Active = true
-            ActualBox.Selectable = true
+            ActualBox.Active = true[span_6](start_span)[span_6](end_span)
+            ActualBox.Selectable = true[span_7](start_span)[span_7](end_span)
             
             local ABCorner = Instance.new("UICorner")
             ABCorner.CornerRadius = UDim.new(0, 4)
             ABCorner.Parent = ActualBox
             
+            local ABStroke = Instance.new("UIStroke")
+            ABStroke.Color = Color3.fromRGB(40, 40, 50)
+            ABStroke.Parent = ActualBox
+            
             local OverlayTrigger = Instance.new("TextButton")
             OverlayTrigger.Size = UDim2.new(1, 0, 1, 0)
             OverlayTrigger.BackgroundTransparency = 1
             OverlayTrigger.Text = ""
-            OverlayTrigger.ZIndex = 5
+            OverlayTrigger.ZIndex = 5[span_8](start_span)[span_8](end_span)
             OverlayTrigger.Parent = ActualBox
 
             OverlayTrigger.InputEnded:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    ActualBox:CaptureFocus()
+                    ActualBox:CaptureFocus()[span_9](start_span)[span_9](end_span)
                 end
             end)
 
@@ -739,54 +744,6 @@ function W7Lib:CreateWindow(judulScript)
             end)
             
             table.insert(ElementsLibrary, {Name = text, Instance = BoxFrame})
-        end
-
-        function TabFunctions:CreateParagraph(title, desc)
-            local ParaFrame = Instance.new("Frame")
-            ParaFrame.Name = title
-            ParaFrame.Size = UDim2.new(0.94, 0, 0, 50)
-            ParaFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
-            ParaFrame.BackgroundTransparency = Config.BgImage ~= "" and 0.5 or 0
-            ParaFrame.Parent = Page
-            
-            local PCorner = Instance.new("UICorner")
-            PCorner.CornerRadius = UDim.new(0, 6)
-            PCorner.Parent = ParaFrame
-            
-            local PStroke = Instance.new("UIStroke")
-            PStroke.Color = Color3.fromRGB(35, 35, 45)
-            PStroke.Parent = ParaFrame
-            
-            local TitleLabel = Instance.new("TextLabel")
-            TitleLabel.Size = UDim2.new(0.92, 0, 0, 20)
-            TitleLabel.Position = UDim2.new(0.04, 0, 0, 4)
-            TitleLabel.BackgroundTransparency = 1
-            TitleLabel.Font = Enum.Font.GothamBold
-            TitleLabel.Text = title
-            TitleLabel.TextColor3 = Color3.fromRGB(unpack(Config.ThemeColor))
-            TitleLabel.TextSize = 11
-            TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-            TitleLabel.Parent = ParaFrame
-            
-            local DescLabel = Instance.new("TextLabel")
-            DescLabel.Size = UDim2.new(0.92, 0, 0, 24)
-            DescLabel.Position = UDim2.new(0.04, 0, 0, 22)
-            DescLabel.BackgroundTransparency = 1
-            DescLabel.Font = Enum.Font.Gotham
-            DescLabel.Text = desc
-            DescLabel.TextColor3 = Color3.fromRGB(170, 170, 180)
-            DescLabel.TextSize = 11
-            DescLabel.TextXAlignment = Enum.TextXAlignment.Left
-            DescLabel.TextYAlignment = Enum.TextYAlignment.Top
-            DescLabel.TextWrapped = true
-            DescLabel.Parent = ParaFrame
-            
-            if DescLabel.TextBounds.X > DescLabel.AbsoluteSize.X then
-                ParaFrame.Size = UDim2.new(0.94, 0, 0, 60)
-                DescLabel.Size = UDim2.new(0.92, 0, 0, 34)
-            end
-            
-            table.insert(ElementsLibrary, {Name = title .. " " .. desc, Instance = ParaFrame})
         end
 
         function WindowFunctions:SetBackgroundImage(assetId)
